@@ -84,6 +84,20 @@
       font-size: 14px;
       color: #aaa;
     }
+
+    #histori {
+      margin-top: 15px;
+      text-align: left;
+      max-height: 150px;
+      overflow-y: auto;
+      padding-left: 10px;
+    }
+
+    #histori li {
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #ccc;
+    }
   </style>
 </head>
 <body>
@@ -112,10 +126,15 @@
       <button type="submit">Kirim Absensi</button>
     </form>
     <p id="status"></p>
+
+    <h3 style="margin-top:20px; color:#00fff7;">Histori Absensi</h3>
+    <ul id="histori"></ul>
   </div>
 
   <script>
     const form = document.getElementById('absenForm');
+    const historiList = document.getElementById('histori');
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = new FormData(form);
@@ -125,12 +144,21 @@
         .then(res => res.text())
         .then(txt => {
           document.getElementById('status').innerText = "Absensi berhasil!";
+          tambahHistori(data.get('nama'), data.get('shift'));
           form.reset();
         })
         .catch(err => {
           document.getElementById('status').innerText = "Gagal mengirim absensi!";
         });
     });
+
+    function tambahHistori(nama, shift) {
+      const now = new Date();
+      const waktu = now.toLocaleString('id-ID');
+      const li = document.createElement('li');
+      li.innerText = `${waktu} - ${nama} (${shift})`;
+      historiList.prepend(li);
+    }
 
     function updateDateTime() {
       const now = new Date();
