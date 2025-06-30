@@ -103,7 +103,7 @@
       <select name="shift" required>
         <option value="">Pilih Shift</option>
         <option value="Pagi">Pagi</option>
-        <option value="Sore">Sore</option>
+        <option value="Sore">Siang</option>
         <option value="Full Day">Full Day</option>
       </select>
 
@@ -119,7 +119,7 @@
       const data = new FormData(form);
       const params = new URLSearchParams(data);
       
-      fetch('https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec' + params.toString())
+      fetch('https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec?' + params.toString())
         .then(res => res.text())
         .then(txt => {
           document.getElementById('status').innerText = "Absensi berhasil!";
