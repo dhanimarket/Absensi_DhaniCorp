@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Absensi - Dhani Market</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #00fff7;
+      text-shadow: 0 0 15px #00fff7;
+      margin-bottom: 10px;
+    }
+
+    .absen-box {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00fff7;
+      width: 300px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    input, select {
+      background: #2a2a2a;
+      color: #fff;
+    }
+
+    button {
+      background: #00fff7;
+      color: #000;
+      font-weight: 600;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #00d6d0;
+    }
+
+    #status {
+      margin-top: 15px;
+      color: #00fff7;
+      text-shadow: 0 0 10px #00fff7;
+    }
+
+    #datetime {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <img src="logo.png" alt="Logo Dhani Market" class="logo">
+
+  <h1>Absensi Karyawan</h1>
+
+  <div class="absen-box">
+    <div id="datetime"></div>
+
+    <form id="absenForm">
+      <label>Nama:</label>
+      <input type="text" name="nama" required>
+
+      <label>Shift:</label>
+      <select name="shift" required>
+        <option value="">Pilih Shift</option>
+        <option value="Pagi">Pagi</option>
+        <option value="Sore">Sore</option>
+        <option value="Full Day">Full Day</option>
+      </select>
+
+      <button type="submit">Kirim Absensi</button>
+    </form>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const form = document.getElementById('absenForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const params = new URLSearchParams(data);
+      
+      fetch('https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec' + params.toString())
+        .then(res => res.text())
+        .then(txt => {
+          document.getElementById('status').innerText = "Absensi berhasil!";
+          form.reset();
+        })
+        .catch(err => {
+          document.getElementById('status').innerText = "Gagal mengirim absensi!";
+        });
+    });
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const date = now.toLocaleDateString('id-ID', options);
+      const time = now.toLocaleTimeString('id-ID');
+      document.getElementById('datetime').innerText = `${date} | ${time}`;
+    }
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+  </script>
+
+</body>
+</html>
