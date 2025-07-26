@@ -3,150 +3,196 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Absensi Worker</title>
+  <title>Absensi Worker - Dhani Market</title>
   <style>
     body {
-      background-color: #111;
-      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      font-family: 'Poppins', sans-serif;
+      color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      color: #fff;
-    }
-
-    .logo {
-      margin-bottom: 10px;
+      margin: 0;
     }
 
     .container {
-      background-color: #222;
+      background: #1a1a1a;
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 0 25px cyan;
+      width: 320px;
       text-align: center;
-      max-width: 350px;
     }
 
     h1 {
-      color: cyan;
-      margin-bottom: 20px;
-      text-shadow: 0 0 8px cyan;
+      color: #00fff7;
+      text-shadow: 0 0 10px #00fff7;
     }
 
     input, select, button {
       width: 100%;
+      margin-top: 10px;
       padding: 12px;
-      margin: 8px 0;
-      border: none;
       border-radius: 8px;
-      font-size: 16px;
+      border: none;
+      font-size: 15px;
     }
 
     button {
-      background-color: cyan;
+      background: #00fff7;
       font-weight: bold;
+      color: #000;
       cursor: pointer;
-      color: black;
-      transition: 0.3s;
     }
 
     button:hover {
-      background-color: #00ffff;
+      background: #00e0e0;
     }
 
-    #historiPopup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222;
-      color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px cyan;
-      z-index: 10;
-    }
-
-    #overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background-color: rgba(0,0,0,0.6);
-      z-index: 9;
-    }
-
-    .motivation {
-      margin-top: 15px;
+    #motivasi {
+      margin-top: 10px;
+      color: #00fff7;
       font-size: 14px;
-      color: #0ff;
-      text-shadow: 0 0 5px #0ff;
-      display: none;
+      text-shadow: 0 0 5px #00fff7;
     }
 
     a {
-      color: cyan;
+      margin-top: 15px;
+      color: #00fff7;
       cursor: pointer;
-      font-weight: bold;
-      display: inline-block;
-      margin-top: 12px;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+
+    /* Modal Histori */
+    #overlay, #historiPopup {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+    }
+
+    #overlay {
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    #historiPopup {
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px cyan;
+      color: white;
+      width: 300px;
+    }
+
+    #historiPopup h3 {
+      margin-top: 0;
+      color: #00fff7;
+    }
+
+    #historiList p {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+
+    .logo {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <img class="logo" src="https://i.postimg.cc/TYg5kk7t/Warna-Biru-Hitam-1.png" alt="Logo" width="70"/>
+
+  <div class="logo">
+    <img src="https://i.postimg.cc/TYg5kk7t/Warna-Biru-Hitam-1.png" alt="Logo Dhani Market" width="100" />
+  </div>
 
   <div class="container">
     <h1>Absensi Worker</h1>
-    <input type="text" id="nama" placeholder="Masukkan nama">
-    <select id="shift">
+    <input type="text" id="nama" placeholder="Masukkan Nama" required />
+    <select id="shift" required>
       <option value="">Pilih Shift</option>
       <option value="Pagi">Pagi</option>
       <option value="Siang">Siang</option>
       <option value="Malam">Malam</option>
     </select>
     <button onclick="kirimAbsensi()">Kirim Absensi</button>
-    <a onclick="tampilkanHistori()">Histori Absensi</a>
-    <div class="motivation" id="motivasi">Semangat kerja! Kaizen setiap hari 💪</div>
+    <div id="motivasi"></div>
+    <a onclick="tampilkanHistori()">Lihat Histori Terakhir</a>
   </div>
 
+  <!-- Modal Histori -->
   <div id="overlay" onclick="tutupHistori()"></div>
   <div id="historiPopup">
     <h3>Histori Absensi</h3>
-    <p>- Robi, Shift Pagi, 08:00</p>
-    <p>- Dwi, Shift Siang, 14:00</p>
-    <p>- Najib, Shift Malam, 22:00</p>
-    <button onclick="tutupHistori()">Tutup</button>
+    <div id="historiList">Memuat...</div>
+    <button onclick="tutupHistori()" style="margin-top:15px;">Tutup</button>
   </div>
 
-  <audio id="successSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+  <!-- Sound -->
+  <audio id="sfx" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-reward-952.mp3"></audio>
 
   <script>
+    const motivasiList = [
+      "Semangat kerja hari ini 💪",
+      "Terima kasih sudah hadir tepat waktu 🙌",
+      "Semoga harimu menyenangkan 🌞",
+      "Kerja kerasmu adalah investasi masa depan 💼",
+      "Terus jaga konsistensi dan semangatmu! 🔥",
+      "Kehadiranmu sangat berarti untuk tim 💙",
+      "Kamu luar biasa, tetap produktif! 🚀"
+    ];
+
     function kirimAbsensi() {
       const nama = document.getElementById('nama').value;
       const shift = document.getElementById('shift').value;
-      const motivasi = document.getElementById('motivasi');
-      const sound = document.getElementById('successSound');
+      const motivasiBox = document.getElementById('motivasi');
 
-      if (nama && shift) {
-        sound.play();
-        motivasi.style.display = 'block';
-        setTimeout(() => {
-          motivasi.style.display = 'none';
-        }, 4000);
-        alert("Absensi berhasil dikirim!");
-        // TODO: Kirim data ke Google Apps Script di sini
-      } else {
-        alert("Mohon isi nama dan pilih shift.");
+      if (!nama || !shift) {
+        alert("Nama dan shift wajib diisi!");
+        return;
       }
+
+      const url = `https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec?nama=${encodeURIComponent(nama)}&shift=${encodeURIComponent(shift)}`;
+
+      fetch(url)
+        .then(res => res.text())
+        .then(() => {
+          const pesan = motivasiList[Math.floor(Math.random() * motivasiList.length)];
+          motivasiBox.innerText = "✅ Absensi berhasil! " + pesan;
+          document.getElementById('sfx').play();
+          document.getElementById('nama').value = "";
+          document.getElementById('shift').value = "";
+          setTimeout(() => motivasiBox.innerText = "", 5000);
+        })
+        .catch(() => {
+          motivasiBox.innerText = "❌ Gagal mengirim absensi!";
+        });
     }
 
     function tampilkanHistori() {
-      document.getElementById('overlay').style.display = 'block';
-      document.getElementById('historiPopup').style.display = 'block';
+      const overlay = document.getElementById('overlay');
+      const popup = document.getElementById('historiPopup');
+      const list = document.getElementById('historiList');
+
+      overlay.style.display = 'block';
+      popup.style.display = 'block';
+      list.innerHTML = 'Memuat...';
+
+      fetch("https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec")
+        .then(res => res.json())
+        .then(data => {
+          list.innerHTML = data.map(d =>
+            `<p>📌 ${d.nama} - ${d.shift} (${new Date(d.waktu).toLocaleString('id-ID')})</p>`
+          ).join('');
+        })
+        .catch(() => {
+          list.innerHTML = "<p>Gagal memuat histori!</p>";
+        });
     }
 
     function tutupHistori() {
@@ -154,5 +200,6 @@
       document.getElementById('historiPopup').style.display = 'none';
     }
   </script>
+
 </body>
 </html>
