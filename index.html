@@ -1,140 +1,196 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <base target="_top">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Absensi Dhani Corp</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Absensi - Dhani Market</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
     body {
-      font-family: 'Arial', sans-serif;
-      padding: 20px;
-      background: #f0f4f8;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      padding: 20px;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      border-radius: 12px;
-      text-align: center;
-    }
-    .popup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-      z-index: 1000;
-      text-align: center;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .popup h3 {
       margin: 0;
-      font-size: 18px;
+      font-family: 'Poppins', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
     }
-    #history {
-      margin-top: 20px;
+
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #00fff7;
+      text-shadow: 0 0 15px #00fff7;
+      margin-bottom: 10px;
+    }
+
+    .absen-box {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00fff7;
+      width: 320px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
       text-align: left;
     }
-    .history-item {
-      background: #e8f0fe;
+
+    input, select, button {
+      width: 100%;
       padding: 10px;
+      margin-top: 5px;
+      border: none;
       border-radius: 8px;
-      margin-bottom: 10px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    input, select {
+      background: #2a2a2a;
+      color: #fff;
+    }
+
+    button {
+      background: #00fff7;
+      color: #000;
+      font-weight: 600;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #00d6d0;
+    }
+
+    #status {
+      margin-top: 15px;
+      color: #00fff7;
+      text-shadow: 0 0 10px #00fff7;
+    }
+
+    #datetime {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    #histori {
+      margin-top: 15px;
+      text-align: left;
+      max-height: 150px;
+      overflow-y: auto;
+      padding-left: 10px;
+    }
+
+    #histori li {
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Absensi Karyawan</h2>
-    <form id="form">
-      <input type="text" name="nama" placeholder="Nama" required><br><br>
+
+  <div style="text-align: center; margin-bottom: 20px;">
+    <img src="logo.png" alt="Logo Dhani Market" class="logo">
+  </div>
+
+  <h1>Absensi Worker</h1>
+
+  <div class="absen-box">
+    <div id="datetime"></div>
+
+    <form id="absenForm">
+      <label>Nama:</label>
+      <input type="text" name="nama" required>
+
+      <label>Shift:</label>
       <select name="shift" required>
         <option value="">Pilih Shift</option>
         <option value="Pagi">Pagi</option>
-        <option value="Siang">Siang</option>
-        <option value="Malam">Malam</option>
-      </select><br><br>
-      <button type="submit">Absen</button>
-    </form>
-    <p id="status"></p>
-    <div id="history"></div>
-  </div>
+        <option value="Sore">Siang</option>
+        <option value="Full Day">Full Day</option>
+      </select>
 
-  <div class="popup" id="popup">
-    <h3 id="popup-text"></h3>
+      <button type="submit">Kirim Absensi</button>
+    </form>
+
+    <p id="status"></p>
+
+    <h3 style="margin-top:20px; color:#00fff7;">Histori Absensi</h3>
+    <ul id="histori"></ul>
   </div>
 
   <script>
-    const form = document.getElementById("form");
-    const statusText = document.getElementById("status");
-    const popup = document.getElementById("popup");
-    const popupText = document.getElementById("popup-text");
+    const form = document.getElementById('absenForm');
+    const historiList = document.getElementById('histori');
 
-    const pesanMotivasi = [
-      "Semangat kerja hari ini 💪",
-      "Terima kasih sudah hadir tepat waktu 🙌",
-      "Semoga harimu menyenangkan 🌞",
-      "Kerja kerasmu adalah investasi masa depan 💼",
-      "Terus jaga konsistensi dan semangatmu! 🔥",
-      "Kehadiranmu sangat berarti untuk tim 💙",
-      "Kamu luar biasa, tetap produktif! 🚀"
+    const kataMotivasi = [
+      "Terus semangat, kerja cerdas hari ini!",
+      "Setiap detik kerja kerasmu adalah investasi masa depan!",
+      "Hari ini peluangmu untuk jadi lebih baik!",
+      "Fokus dan satset, karena kamu hebat!",
+      "Langkah kecilmu hari ini, sukses besarmu besok!"
     ];
 
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec";
-
-    function showPopup(message) {
-      popupText.innerText = message;
-      popup.style.display = 'block';
-      setTimeout(() => {
-        popup.style.display = 'none';
-      }, 3000);
-    }
-
-    form.addEventListener("submit", function(e) {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = new FormData(form);
-      const params = new URLSearchParams(data).toString();
-      fetch(`${WEB_APP_URL}?${params}`)
+      const params = new URLSearchParams(data);
+
+      fetch('https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec?' + params.toString())
         .then(res => res.text())
         .then(txt => {
-          const randomPesan = pesanMotivasi[Math.floor(Math.random() * pesanMotivasi.length)];
-          statusText.innerText = "Absensi berhasil!";
-          showPopup(randomPesan);
+          document.getElementById('status').innerText = "Absensi berhasil!";
+          showMotivasi();
           form.reset();
-          loadHistori();
+          ambilHistori(data.get('nama'));
         })
         .catch(err => {
-          statusText.innerText = "Gagal absen. Coba lagi nanti.";
+          document.getElementById('status').innerText = "Gagal mengirim absensi!";
         });
     });
 
-    function loadHistori() {
-      fetch(WEB_APP_URL)
+    function showMotivasi() {
+      const random = Math.floor(Math.random() * kataMotivasi.length);
+      alert("🔥 " + kataMotivasi[random]);
+    }
+
+    function ambilHistori(nama) {
+      fetch('https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec?histori=1&nama=' + encodeURIComponent(nama))
         .then(res => res.json())
         .then(data => {
-          const historyDiv = document.getElementById("history");
-          historyDiv.innerHTML = "<h3>Riwayat Absen Terakhir</h3>";
-          data.forEach(item => {
-            const el = document.createElement("div");
-            el.className = "history-item";
-            const waktu = new Date(item.waktu).toLocaleString("id-ID");
-            el.innerHTML = `<strong>${item.nama}</strong> - ${item.shift}<br><small>${waktu}</small>`;
-            historyDiv.appendChild(el);
+          historiList.innerHTML = '';
+          data.slice(0, 3).forEach(item => {
+            const li = document.createElement('li');
+            li.innerText = `${item.waktu} - ${item.nama} (${item.shift})`;
+            historiList.appendChild(li);
           });
         });
     }
 
-    loadHistori();
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const date = now.toLocaleDateString('id-ID', options);
+      const time = now.toLocaleTimeString('id-ID');
+      document.getElementById('datetime').innerText = `${date} | ${time}`;
+    }
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
   </script>
+
 </body>
 </html>
