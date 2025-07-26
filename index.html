@@ -6,169 +6,152 @@
   <title>Absensi Worker</title>
   <style>
     body {
-      background: #111;
+      background-color: #111;
       font-family: 'Segoe UI', sans-serif;
-      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      margin: 0;
+      color: #fff;
     }
 
     .logo {
       margin-bottom: 10px;
     }
 
-    .logo img {
-      height: 80px;
-    }
-
-    h2 {
-      color: #00ffff;
-      margin-bottom: 20px;
-      text-shadow: 0 0 10px #00ffff;
-    }
-
-    .absensi-box {
-      background: #1a1a1a;
-      border-radius: 15px;
+    .container {
+      background-color: #222;
       padding: 30px;
-      width: 320px;
-      box-shadow: 0 0 20px #00ffff80;
+      border-radius: 15px;
+      box-shadow: 0 0 25px cyan;
       text-align: center;
+      max-width: 350px;
+    }
+
+    h1 {
+      color: cyan;
+      margin-bottom: 20px;
+      text-shadow: 0 0 8px cyan;
     }
 
     input, select, button {
       width: 100%;
-      margin: 10px 0;
       padding: 12px;
-      border-radius: 8px;
+      margin: 8px 0;
       border: none;
+      border-radius: 8px;
       font-size: 16px;
     }
 
     button {
-      background: #00ffff;
-      color: #000;
+      background-color: cyan;
       font-weight: bold;
       cursor: pointer;
+      color: black;
+      transition: 0.3s;
     }
 
     button:hover {
-      background: #00e0e0;
+      background-color: #00ffff;
+    }
+
+    #historiPopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px cyan;
+      z-index: 10;
+    }
+
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0,0,0,0.6);
+      z-index: 9;
+    }
+
+    .motivation {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #0ff;
+      text-shadow: 0 0 5px #0ff;
+      display: none;
     }
 
     a {
-      display: block;
-      margin-top: 15px;
-      color: #00ffff;
+      color: cyan;
       cursor: pointer;
-      text-decoration: underline;
-    }
-
-    /* Modal Pop-up */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.6);
-    }
-
-    .modal-content {
-      background-color: #222;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 15px;
-      width: 80%;
-      max-width: 400px;
-      color: #00ffff;
-      box-shadow: 0 0 20px #00ffff80;
-      text-align: center;
-    }
-
-    .close {
-      color: #00ffff;
-      float: right;
-      font-size: 24px;
-      cursor: pointer;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 12px;
     }
   </style>
 </head>
 <body>
-  <div class="logo">
-    <img src="https://i.postimg.cc/TYg5kk7t/Warna-Biru-Hitam-1.png" alt="Logo" />
-  </div>
-  <h2>Absensi Worker</h2>
-  <div class="absensi-box">
-    <form id="absenForm">
-      <label for="nama">Nama:</label>
-      <input type="text" id="nama" required />
+  <img class="logo" src="https://i.postimg.cc/TYg5kk7t/Warna-Biru-Hitam-1.png" alt="Logo" width="70"/>
 
-      <label for="shift">Shift:</label>
-      <select id="shift" required>
-        <option value="">Pilih Shift</option>
-        <option value="Pagi">Pagi</option>
-        <option value="Siang">Siang</option>
-        <option value="Malam">Malam</option>
-      </select>
-
-      <button type="submit">Kirim Absensi</button>
-    </form>
-
-    <a id="openHistory">Histori Absensi</a>
+  <div class="container">
+    <h1>Absensi Worker</h1>
+    <input type="text" id="nama" placeholder="Masukkan nama">
+    <select id="shift">
+      <option value="">Pilih Shift</option>
+      <option value="Pagi">Pagi</option>
+      <option value="Siang">Siang</option>
+      <option value="Malam">Malam</option>
+    </select>
+    <button onclick="kirimAbsensi()">Kirim Absensi</button>
+    <a onclick="tampilkanHistori()">Histori Absensi</a>
+    <div class="motivation" id="motivasi">Semangat kerja! Kaizen setiap hari 💪</div>
   </div>
 
-  <!-- Modal Motivasi -->
-  <div id="motivasiModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('motivasiModal')">&times;</span>
-      <p><strong>🔥 Semangat Bro Bi!</strong><br>Terima kasih sudah absen. Tetap disiplin dan terus jadi versi terbaikmu hari ini!</p>
-    </div>
+  <div id="overlay" onclick="tutupHistori()"></div>
+  <div id="historiPopup">
+    <h3>Histori Absensi</h3>
+    <p>- Robi, Shift Pagi, 08:00</p>
+    <p>- Dwi, Shift Siang, 14:00</p>
+    <p>- Najib, Shift Malam, 22:00</p>
+    <button onclick="tutupHistori()">Tutup</button>
   </div>
 
-  <!-- Modal Histori -->
-  <div id="historyModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('historyModal')">&times;</span>
-      <h3>Histori Absensi</h3>
-      <p>📅 24 Juli 2025 - Shift Pagi<br>📅 25 Juli 2025 - Shift Malam<br>📅 26 Juli 2025 - Shift Siang</p>
-    </div>
-  </div>
-
-  <audio id="notifikasiSound" src="https://www.myinstants.com/media/sounds/mario-coin.mp3" preload="auto"></audio>
+  <audio id="successSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
 
   <script>
-    document.getElementById('absenForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+    function kirimAbsensi() {
       const nama = document.getElementById('nama').value;
       const shift = document.getElementById('shift').value;
+      const motivasi = document.getElementById('motivasi');
+      const sound = document.getElementById('successSound');
 
-      if(nama && shift) {
-        document.getElementById('notifikasiSound').play();
-        openModal('motivasiModal');
-        document.getElementById('absenForm').reset();
+      if (nama && shift) {
+        sound.play();
+        motivasi.style.display = 'block';
+        setTimeout(() => {
+          motivasi.style.display = 'none';
+        }, 4000);
+        alert("Absensi berhasil dikirim!");
+        // TODO: Kirim data ke Google Apps Script di sini
+      } else {
+        alert("Mohon isi nama dan pilih shift.");
       }
-    });
-
-    document.getElementById('openHistory').onclick = () => openModal('historyModal');
-
-    function openModal(id) {
-      document.getElementById(id).style.display = 'block';
     }
 
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
+    function tampilkanHistori() {
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('historiPopup').style.display = 'block';
     }
 
-    window.onclick = function(event) {
-      ['motivasiModal', 'historyModal'].forEach(id => {
-        const modal = document.getElementById(id);
-        if (event.target === modal) modal.style.display = "none";
-      });
+    function tutupHistori() {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('historiPopup').style.display = 'none';
     }
   </script>
 </body>
