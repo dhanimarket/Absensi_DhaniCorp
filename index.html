@@ -135,6 +135,15 @@
     const form = document.getElementById('absenForm');
     const historiList = document.getElementById('histori');
 
+const pesanMotivasi = [
+  "Semangat kerja hari ini 💪",
+  "Terima kasih sudah hadir tepat waktu 🙌",
+  "Semoga harimu menyenangkan 🌞",
+  "Kerja kerasmu adalah investasi masa depan 💼",
+  "Terus jaga konsistensi dan semangatmu! 🔥",
+  "Kehadiranmu sangat berarti untuk tim 💙",
+  "Kamu luar biasa, tetap produktif! 🚀"
+];
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = new FormData(form);
@@ -143,10 +152,12 @@
       fetch('https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec?' + params.toString())
         .then(res => res.text())
         .then(txt => {
-          document.getElementById('status').innerText = "Absensi berhasil!";
-          tambahHistori(data.get('nama'), data.get('shift'));
-          form.reset();
-        })
+          .then(txt => {
+  const randomPesan = pesanMotivasi[Math.floor(Math.random() * pesanMotivasi.length)];
+  document.getElementById('status').innerText = `Absensi berhasil! ${randomPesan}`;
+  tambahHistori(data.get('nama'), data.get('shift'));
+  form.reset();
+})
         .catch(err => {
           document.getElementById('status').innerText = "Gagal mengirim absensi!";
         });
