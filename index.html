@@ -1,187 +1,175 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Absensi - Dhani Market</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Absensi Worker</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
     body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: #0f0f0f;
+      background: #111;
+      font-family: 'Segoe UI', sans-serif;
       color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      margin: 0;
     }
 
     .logo {
-      width: 120px;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      color: #00fff7;
-      text-shadow: 0 0 15px #00fff7;
       margin-bottom: 10px;
     }
 
-    .absen-box {
-      background: #1a1a1a;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #00fff7;
-      width: 300px;
-      text-align: center;
+    .logo img {
+      height: 80px;
     }
 
-    label {
-      display: block;
-      margin-top: 15px;
-      text-align: left;
+    h2 {
+      color: #00ffff;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #00ffff;
+    }
+
+    .absensi-box {
+      background: #1a1a1a;
+      border-radius: 15px;
+      padding: 30px;
+      width: 320px;
+      box-shadow: 0 0 20px #00ffff80;
+      text-align: center;
     }
 
     input, select, button {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: none;
+      margin: 10px 0;
+      padding: 12px;
       border-radius: 8px;
-      outline: none;
+      border: none;
       font-size: 16px;
     }
 
-    input, select {
-      background: #2a2a2a;
-      color: #fff;
-    }
-
     button {
-      background: #00fff7;
+      background: #00ffff;
       color: #000;
-      font-weight: 600;
-      margin-top: 20px;
+      font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s;
     }
 
     button:hover {
-      background: #00d6d0;
+      background: #00e0e0;
     }
 
-    #status {
+    a {
+      display: block;
       margin-top: 15px;
-      color: #00fff7;
-      text-shadow: 0 0 10px #00fff7;
+      color: #00ffff;
+      cursor: pointer;
+      text-decoration: underline;
     }
 
-    #datetime {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #aaa;
+    /* Modal Pop-up */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
     }
 
-    #histori {
-      margin-top: 15px;
-      text-align: left;
-      max-height: 150px;
-      overflow-y: auto;
-      padding-left: 10px;
+    .modal-content {
+      background-color: #222;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 400px;
+      color: #00ffff;
+      box-shadow: 0 0 20px #00ffff80;
+      text-align: center;
     }
 
-    #histori li {
-      margin-bottom: 5px;
-      font-size: 14px;
-      color: #ccc;
+    .close {
+      color: #00ffff;
+      float: right;
+      font-size: 24px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-
- <div style="text-align: center; margin-bottom: 20px;">
-  <img src="logo.png" alt="Logo Dhani Market" width="120">
-</div>
-
-  <h1>Absensi Worker</h1>
-
-  <div class="absen-box">
-    <div id="datetime"></div>
-
+  <div class="logo">
+    <img src="https://i.postimg.cc/TYg5kk7t/Warna-Biru-Hitam-1.png" alt="Logo" />
+  </div>
+  <h2>Absensi Worker</h2>
+  <div class="absensi-box">
     <form id="absenForm">
-      <label>Nama:</label>
-      <input type="text" name="nama" required>
+      <label for="nama">Nama:</label>
+      <input type="text" id="nama" required />
 
-      <label>Shift:</label>
-      <select name="shift" required>
+      <label for="shift">Shift:</label>
+      <select id="shift" required>
         <option value="">Pilih Shift</option>
         <option value="Pagi">Pagi</option>
-        <option value="Sore">Siang</option>
-        <option value="Full Day">Full Day</option>
+        <option value="Siang">Siang</option>
+        <option value="Malam">Malam</option>
       </select>
 
       <button type="submit">Kirim Absensi</button>
     </form>
-    <p id="status"></p>
 
-    <h3 style="margin-top:20px; color:#00fff7;">Histori Absensi</h3>
-    <ul id="histori"></ul>
+    <a id="openHistory">Histori Absensi</a>
   </div>
 
-  <script>
-    const form = document.getElementById('absenForm');
-    const historiList = document.getElementById('histori');
+  <!-- Modal Motivasi -->
+  <div id="motivasiModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('motivasiModal')">&times;</span>
+      <p><strong>🔥 Semangat Bro Bi!</strong><br>Terima kasih sudah absen. Tetap disiplin dan terus jadi versi terbaikmu hari ini!</p>
+    </div>
+  </div>
 
-const pesanMotivasi = [
-  "Semangat kerja hari ini 💪",
-  "Terima kasih sudah hadir tepat waktu 🙌",
-  "Semoga harimu menyenangkan 🌞",
-  "Kerja kerasmu adalah investasi masa depan 💼",
-  "Terus jaga konsistensi dan semangatmu! 🔥",
-  "Kehadiranmu sangat berarti untuk tim 💙",
-  "Kamu luar biasa, tetap produktif! 🚀"
-];
-    form.addEventListener('submit', async (e) => {
+  <!-- Modal Histori -->
+  <div id="historyModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('historyModal')">&times;</span>
+      <h3>Histori Absensi</h3>
+      <p>📅 24 Juli 2025 - Shift Pagi<br>📅 25 Juli 2025 - Shift Malam<br>📅 26 Juli 2025 - Shift Siang</p>
+    </div>
+  </div>
+
+  <audio id="notifikasiSound" src="https://www.myinstants.com/media/sounds/mario-coin.mp3" preload="auto"></audio>
+
+  <script>
+    document.getElementById('absenForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const data = new FormData(form);
-      const params = new URLSearchParams(data);
-      
-      fetch('https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec?' + params.toString())
-        .then(res => res.text())
-        .then(txt => {
-          .then(txt => {
-  const randomPesan = pesanMotivasi[Math.floor(Math.random() * pesanMotivasi.length)];
-  document.getElementById('status').innerText = `Absensi berhasil! ${randomPesan}`;
-  tambahHistori(data.get('nama'), data.get('shift'));
-  form.reset();
-})
-        .catch(err => {
-          document.getElementById('status').innerText = "Gagal mengirim absensi!";
-        });
+      const nama = document.getElementById('nama').value;
+      const shift = document.getElementById('shift').value;
+
+      if(nama && shift) {
+        document.getElementById('notifikasiSound').play();
+        openModal('motivasiModal');
+        document.getElementById('absenForm').reset();
+      }
     });
 
-    function tambahHistori(nama, shift) {
-      const now = new Date();
-      const waktu = now.toLocaleString('id-ID');
-      const li = document.createElement('li');
-      li.innerText = `${waktu} - ${nama} (${shift})`;
-      historiList.prepend(li);
+    document.getElementById('openHistory').onclick = () => openModal('historyModal');
+
+    function openModal(id) {
+      document.getElementById(id).style.display = 'block';
     }
 
-    function updateDateTime() {
-      const now = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const date = now.toLocaleDateString('id-ID', options);
-      const time = now.toLocaleTimeString('id-ID');
-      document.getElementById('datetime').innerText = `${date} | ${time}`;
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
     }
 
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
+    window.onclick = function(event) {
+      ['motivasiModal', 'historyModal'].forEach(id => {
+        const modal = document.getElementById(id);
+        if (event.target === modal) modal.style.display = "none";
+      });
+    }
   </script>
-
 </body>
 </html>
