@@ -1,143 +1,86 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Absensi Worker - Dhani Market</title>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Absensi Dhani Corp</title>
   <style>
     body {
-      background: #0f0f0f;
-      font-family: 'Poppins', sans-serif;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
+      background: #f0f4f8;
     }
-
     .container {
-      background: #1a1a1a;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 25px cyan;
-      width: 320px;
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
       text-align: center;
     }
-
-    h1 {
-      color: #00fff7;
-      text-shadow: 0 0 10px #00fff7;
-    }
-
-    input, select, button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 15px;
-    }
-
-    button {
-      background: #00fff7;
-      font-weight: bold;
-      color: #000;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #00e0e0;
-    }
-
-    #motivasi {
-      margin-top: 10px;
-      color: #00fff7;
-      font-size: 14px;
-      text-shadow: 0 0 5px #00fff7;
-    }
-
-    a {
-      margin-top: 15px;
-      color: #00fff7;
-      cursor: pointer;
-      font-size: 14px;
-      text-decoration: underline;
-    }
-
-    /* Modal Histori */
-    #overlay, #historiPopup {
+    .popup {
       display: none;
       position: fixed;
-      z-index: 1000;
-    }
-
-    #overlay {
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.7);
-    }
-
-    #historiPopup {
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
-      background: #222;
+      background: #ffffff;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px cyan;
-      color: white;
-      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+      z-index: 1000;
+      text-align: center;
+      animation: fadeIn 0.3s ease-in-out;
     }
-
-    #historiPopup h3 {
-      margin-top: 0;
-      color: #00fff7;
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-
-    #historiList p {
-      font-size: 14px;
-      margin: 5px 0;
+    .popup h3 {
+      margin: 0;
+      font-size: 18px;
     }
-
-    .logo {
-      margin-bottom: 20px;
+    #history {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .history-item {
+      background: #e8f0fe;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-
-  <div class="logo">
-    <img src="https://i.postimg.cc/TYg5kk7t/Warna-Biru-Hitam-1.png" alt="Logo Dhani Market" width="100" />
-  </div>
-
   <div class="container">
-    <h1>Absensi Worker</h1>
-    <input type="text" id="nama" placeholder="Masukkan Nama" required />
-    <select id="shift" required>
-      <option value="">Pilih Shift</option>
-      <option value="Pagi">Pagi</option>
-      <option value="Siang">Siang</option>
-      <option value="Malam">Malam</option>
-    </select>
-    <button onclick="kirimAbsensi()">Kirim Absensi</button>
-    <div id="motivasi"></div>
-    <a onclick="tampilkanHistori()">Lihat Histori Terakhir</a>
+    <h2>Absensi Karyawan</h2>
+    <form id="form">
+      <input type="text" name="nama" placeholder="Nama" required><br><br>
+      <select name="shift" required>
+        <option value="">Pilih Shift</option>
+        <option value="Pagi">Pagi</option>
+        <option value="Siang">Siang</option>
+        <option value="Malam">Malam</option>
+      </select><br><br>
+      <button type="submit">Absen</button>
+    </form>
+    <p id="status"></p>
+    <div id="history"></div>
   </div>
 
-  <!-- Modal Histori -->
-  <div id="overlay" onclick="tutupHistori()"></div>
-  <div id="historiPopup">
-    <h3>Histori Absensi</h3>
-    <div id="historiList">Memuat...</div>
-    <button onclick="tutupHistori()" style="margin-top:15px;">Tutup</button>
+  <div class="popup" id="popup">
+    <h3 id="popup-text"></h3>
   </div>
-
-  <!-- Sound -->
-  <audio id="sfx" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-reward-952.mp3"></audio>
 
   <script>
-    const motivasiList = [
+    const form = document.getElementById("form");
+    const statusText = document.getElementById("status");
+    const popup = document.getElementById("popup");
+    const popupText = document.getElementById("popup-text");
+
+    const pesanMotivasi = [
       "Semangat kerja hari ini 💪",
       "Terima kasih sudah hadir tepat waktu 🙌",
       "Semoga harimu menyenangkan 🌞",
@@ -147,59 +90,51 @@
       "Kamu luar biasa, tetap produktif! 🚀"
     ];
 
-    function kirimAbsensi() {
-      const nama = document.getElementById('nama').value;
-      const shift = document.getElementById('shift').value;
-      const motivasiBox = document.getElementById('motivasi');
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec";
 
-      if (!nama || !shift) {
-        alert("Nama dan shift wajib diisi!");
-        return;
-      }
-
-      const url = `https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec?nama=${encodeURIComponent(nama)}&shift=${encodeURIComponent(shift)}`;
-
-      fetch(url)
-        .then(res => res.text())
-        .then(() => {
-          const pesan = motivasiList[Math.floor(Math.random() * motivasiList.length)];
-          motivasiBox.innerText = "✅ Absensi berhasil! " + pesan;
-          document.getElementById('sfx').play();
-          document.getElementById('nama').value = "";
-          document.getElementById('shift').value = "";
-          setTimeout(() => motivasiBox.innerText = "", 5000);
-        })
-        .catch(() => {
-          motivasiBox.innerText = "❌ Gagal mengirim absensi!";
-        });
+    function showPopup(message) {
+      popupText.innerText = message;
+      popup.style.display = 'block';
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 3000);
     }
 
-    function tampilkanHistori() {
-      const overlay = document.getElementById('overlay');
-      const popup = document.getElementById('historiPopup');
-      const list = document.getElementById('historiList');
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = new FormData(form);
+      const params = new URLSearchParams(data).toString();
+      fetch(`${WEB_APP_URL}?${params}`)
+        .then(res => res.text())
+        .then(txt => {
+          const randomPesan = pesanMotivasi[Math.floor(Math.random() * pesanMotivasi.length)];
+          statusText.innerText = "Absensi berhasil!";
+          showPopup(randomPesan);
+          form.reset();
+          loadHistori();
+        })
+        .catch(err => {
+          statusText.innerText = "Gagal absen. Coba lagi nanti.";
+        });
+    });
 
-      overlay.style.display = 'block';
-      popup.style.display = 'block';
-      list.innerHTML = 'Memuat...';
-
-      fetch("https://script.google.com/macros/s/AKfycbz7cT-s5B2aCowEur3X5jNKOyWNbLG5Pkyrkf-Ed9oYKAjdA3ROHtCQYt9Sp0SXb4AG/exec")
+    function loadHistori() {
+      fetch(WEB_APP_URL)
         .then(res => res.json())
         .then(data => {
-          list.innerHTML = data.map(d =>
-            `<p>📌 ${d.nama} - ${d.shift} (${new Date(d.waktu).toLocaleString('id-ID')})</p>`
-          ).join('');
-        })
-        .catch(() => {
-          list.innerHTML = "<p>Gagal memuat histori!</p>";
+          const historyDiv = document.getElementById("history");
+          historyDiv.innerHTML = "<h3>Riwayat Absen Terakhir</h3>";
+          data.forEach(item => {
+            const el = document.createElement("div");
+            el.className = "history-item";
+            const waktu = new Date(item.waktu).toLocaleString("id-ID");
+            el.innerHTML = `<strong>${item.nama}</strong> - ${item.shift}<br><small>${waktu}</small>`;
+            historyDiv.appendChild(el);
+          });
         });
     }
 
-    function tutupHistori() {
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('historiPopup').style.display = 'none';
-    }
+    loadHistori();
   </script>
-
 </body>
 </html>
